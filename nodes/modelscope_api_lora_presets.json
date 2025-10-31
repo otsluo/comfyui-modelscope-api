@@ -1,0 +1,13 @@
+{
+  "lora_models": [
+    [
+      "qwenimage_test/qwenimage_lora_test1"
+    ],
+    [
+      "flux_test/flux_lora_test2"
+    ],
+    [
+      "qiyuanai/shouchizipai_v1"
+    ]
+  ]
+}
