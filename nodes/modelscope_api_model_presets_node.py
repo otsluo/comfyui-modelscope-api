@@ -11,6 +11,7 @@ SUPPORTED_MODELS = [
     ["Qwen/Qwen-Image-Edit", "Qwen-Image-Edit"],
     ["stabilityai/stable-diffusion-xl-refiner-1.0", "SDXL Refiner"],
     ["runwayml/stable-diffusion-inpainting", "SD Inpainting"],
+    ["Tongyi-MAI/Z-Image-Turbo", "Z-Image-Turbo"],
 ]
 
 # 预设配置相关函数
@@ -61,14 +62,22 @@ def save_model_config(config: dict) -> bool:
         # 用户自定义配置文件路径
         custom_config_path = os.path.join(current_dir, "modelscope_api_model_presets_custom.json")
         
-        # 准备要保存的数据
-        custom_data = {
-            "models": config.get("custom_models", [])
-        }
+        # 获取自定义模型列表
+        custom_models = config.get("custom_models", [])
         
-        # 保存到用户自定义配置文件
-        with open(custom_config_path, 'w', encoding='utf-8') as f:
-            json.dump(custom_data, f, ensure_ascii=False, indent=2)
+        # 只有在有自定义模型时才创建或更新文件
+        if custom_models:
+            # 准备要保存的数据
+            custom_data = {
+                "models": custom_models
+            }
+            
+            # 保存到用户自定义配置文件
+            with open(custom_config_path, 'w', encoding='utf-8') as f:
+                json.dump(custom_data, f, ensure_ascii=False, indent=2)
+        elif os.path.exists(custom_config_path):
+            # 如果没有自定义模型且文件已存在，则删除文件
+            os.remove(custom_config_path)
         
         return True
     except Exception as e:
@@ -125,7 +134,7 @@ class ModelscopeApiSelector:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("model_name",)
     FUNCTION = "get_model_name"
-    CATEGORY = "魔搭api"
+    CATEGORY = "modelscope-api"
     
     def get_model_name(self, model_name):
         """返回选中的魔搭API模型名称"""
@@ -182,7 +191,7 @@ class ModelscopeApiManager:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("status_message",)
     FUNCTION = "manage_models"
-    CATEGORY = "魔搭api"
+    CATEGORY = "modelscope-api"
     
     def manage_models(self, action, model_id="", model_to_delete=""):
         config = load_model_config()
